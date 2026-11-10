@@ -328,7 +328,7 @@
     <div id="pantalla-juego" class="pantalla">
         <div class="marcador-superior">
             <div class="marcador-item">Atracador: <span id="txt-nombre"></span></div>
-            <div class="marcador-item">Cerrojo: <span id="txt-num-pregunta">1/29</span></div>
+            <div class="marcador-item">Cerrojo: <span id="txt-num-pregunta">1/30</span></div>
             <div class="marcador-item">Fase: <span id="txt-nivel">Geometría 2D</span></div>
         </div>
 
@@ -668,7 +668,7 @@
 
         let totalPreguntas = preguntasPartida.length;
         let porcentajeAcierto = Math.round((totalAciertos / totalPreguntas) * 100);
-        let haGanado = porcentajeAcierto > 50;
+        let haGanado = porcentajeAcierto >= 50;
 
         let tituloNode = document.getElementById("titulo-resultado");
         let mensajeNode = document.getElementById("mensaje-final");
