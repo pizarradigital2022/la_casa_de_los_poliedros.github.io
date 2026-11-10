@@ -146,6 +146,81 @@
             cursor: not-allowed;
         }
 
+        .btn-secundario {
+            background-color: #111;
+            color: var(--color-oro);
+            border: 2px solid var(--color-oro);
+        }
+
+        .btn-secundario:hover:not(:disabled) {
+            background-color: var(--color-oro);
+            color: #000;
+            box-shadow: 0 0 15px var(--color-oro);
+        }
+
+        /* Ventana Emergente (Modal) */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-overlay.activo {
+            display: flex;
+        }
+
+        .modal-contenido {
+            background-color: var(--color-panel);
+            border: 3px solid var(--color-rojo-dali);
+            border-radius: 6px;
+            padding: 20px;
+            position: relative;
+            max-width: 90vw;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 0 30px rgba(229, 9, 20, 0.5);
+        }
+
+        .btn-cerrar-modal {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: var(--color-rojo-dali);
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.2s;
+            line-height: 1;
+        }
+
+        .btn-cerrar-modal:hover {
+            color: #fff;
+            text-shadow: 0 0 10px var(--color-rojo-dali);
+        }
+
+        .imagen-repaso-modal {
+            max-width: 75vw;
+            max-height: 75vh;
+            aspect-ratio: 1 / 1;
+            object-fit: contain;
+            border: 2px solid var(--color-borde);
+            border-radius: 4px;
+            margin-top: 25px;
+            background-color: #000;
+        }
+
         /* Interfaz de la Caja Fuerte */
         .marcador-superior {
             display: flex;
@@ -235,7 +310,6 @@
             background-color: rgba(229, 9, 20, 0.1);
         }
 
-        /* Clases de iluminación visual al responder */
         .btn-respuesta.correcto {
             background-color: var(--color-verde-acierto) !important;
             border-color: var(--color-verde-acierto) !important;
@@ -316,7 +390,9 @@
                 <option value="45">45 Minutos (Modo Meticuloso)</option>
             </select>
 
-            <button class="btn" onclick="iniciarJuego()">Iniciar Atraco</button>
+            <button type="button" class="btn btn-secundario" onclick="abrirModalRepaso()">Ver Repaso Previo</button>
+            <button id="btn-iniciar-atraco" class="btn" onclick="iniciarJuego()">Iniciar Atraco</button>
+            
             <hr style="border-color: var(--color-borde); width: 100%;">
             <iframe width="560" height="315" src="https://www.youtube.com/embed/-BSzpwUlpGg?si=7OVuSeTZ111ig15e" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
             <hr style="border-color: var(--color-borde); width: 100%;">
@@ -374,7 +450,7 @@
             </tr>
             <tr>
                 <td>Cerrojos Desbloqueados:</td>
-                <td id="res-aciertos">0 / 29</td>
+                <td id="res-aciertos">0 / 30</td>
             </tr>
             <tr>
                 <td>Porcentaje de Acierto:</td>
@@ -397,8 +473,16 @@
 
 </div>
 
+<!-- VENTANA EMERGENTE (MODAL REPASO PREVIO) -->
+<div id="modal-repaso" class="modal-overlay" onclick="cerrarModalAlClicFuera(event)">
+    <div class="modal-contenido">
+        <button class="btn-cerrar-modal" onclick="cerrarModalRepaso()" title="Cerrar ventana">&times;</button>
+        <img class="imagen-repaso-modal" src="./resources/Repaso_previo_casa_de_los_poliedros.png" alt="Repaso Previo de la Casa de los Poliedros">
+    </div>
+</div>
+
 <script>
-    // BANCO DE PREGUNTAS COMPLETO (29 Preguntas del test de Geometría)
+    // BANCO DE PREGUNTAS COMPLETO (30 Preguntas del test de Geometría)
     const preguntasAtraco = [
         { q: "¿Cuál es la fórmula de la longitud de una circunferencia?", a: ["P = 2πr", "P = πr²", "P = 4r", "P = πd²"], c: "P = 2πr", t: 30 },
         { q: "¿Qué expresión calcula el área de un círculo?", a: ["A = 2πr", "A = πr²", "A = πd", "A = r²/2"], c: "A = πr²", t: 30 },
@@ -428,7 +512,8 @@
         { q: "Una pirámide tiene área de base 30 cm² y altura 6 cm. ¿Volumen?", a: ["180 cm³", "90 cm³", "60 cm³", "30 cm³"], c: "60 cm³", t: 120 },
         { q: "Un cilindro tiene radio 2 cm y altura 5 cm. ¿Cuál es su volumen?", a: ["10π cm³", "20π cm³", "25π cm³", "40π cm³"], c: "20π cm³", t: 240 },
         { q: "Un cono tiene radio 3 cm y altura 4 cm. ¿Cuál es su volumen?", a: ["12π cm³", "36π cm³", "9π cm³", "4π cm³"], c: "12π cm³", t: 240 },
-        { q: "Una pirámide y un prisma tienen igual base y altura. ¿Qué relación hay?", a: ["La pirámide tiene triple volumen", "Tienen el mismo volumen", "La pirámide tiene un tercio del volumen", "El prisma tiene un tercio del volumen"], c: "La pirámide tiene un tercio del volumen", t: 60 }
+        { q: "Una pirámide y un prisma tienen igual base y altura. ¿Qué relación hay?", a: ["La pirámide tiene triple volumen", "Tienen el mismo volumen", "La pirámide tiene un tercio del volumen", "El prisma tiene un tercio del volumen"], c: "La pirámide tiene un tercio del volumen", t: 60 },
+        { q: "¿Cuál es la diferencia entre circunferencia y círculo?", a: ["La circunferencia es la línea (contorno) y el círculo es la superficie interior", "El círculo es la línea exterior y la circunferencia es el área", "Son exactamente lo mismo", "La circunferencia tiene tres dimensiones y el círculo solo dos"], c: "La circunferencia es la línea (contorno) y el círculo es la superficie interior", t: 30 }
     ];
 
     // VARIABLES DE ESTADO
@@ -450,10 +535,30 @@
     let intervaloGlobal;
     let intervaloPregunta;
     let tiempoInicioJuego; 
+    let modalAbierto = false;
 
     function cambiarPantalla(idPantalla) {
         document.querySelectorAll('.pantalla').forEach(p => p.classList.remove('activa'));
         document.getElementById(idPantalla).classList.add('activa');
+    }
+
+    // CONTROL DE VENTANA EMERGENTE (MODAL)
+    function abrirModalRepaso() {
+        document.getElementById("modal-repaso").classList.add("activo");
+        document.getElementById("btn-iniciar-atraco").disabled = true;
+        modalAbierto = true;
+    }
+
+    function cerrarModalRepaso() {
+        document.getElementById("modal-repaso").classList.remove("activo");
+        document.getElementById("btn-iniciar-atraco").disabled = false;
+        modalAbierto = false;
+    }
+
+    function cerrarModalAlClicFuera(event) {
+        if (event.target.id === "modal-repaso") {
+            cerrarModalRepaso();
+        }
     }
 
     // FUNCIÓN PARA BARAJAR PREGUNTAS Y RESPUESTAS
@@ -466,6 +571,8 @@
 
     // INICIO DEL JUEGO
     function iniciarJuego() {
+        if (modalAbierto) return;
+
         const inputNombre = document.getElementById("nombre-jugador").value.trim();
         if (!inputNombre) {
             alert("¡El Profesor exige un nombre en clave antes de empezar!");
@@ -521,7 +628,7 @@
         for (let i = 0; i < 4; i++) {
             let btn = document.getElementById(`btn-opt-${i}`);
             btn.innerText = `${obtenerLetra(i)}) ${opciones[i]}`;
-            btn.classList.remove("oculto", "correcto", "incorrecto"); // Restablece colores originales
+            btn.classList.remove("oculto", "correcto", "incorrecto");
             btn.disabled = false;
             btn.dataset.valor = opciones[i]; 
         }
@@ -623,7 +730,6 @@
     function verificarRespuesta(indiceBoton) {
         clearInterval(intervaloPregunta); 
 
-        // Bloquear temporalmente todos los botones mientras se muestra el color
         for (let i = 0; i < 4; i++) {
             document.getElementById(`btn-opt-${i}`).disabled = true;
         }
@@ -637,14 +743,11 @@
             let puntosGanados = (datosPregunta.t * 100) + (tiempoPreguntaRestanteSegundos * 50);
             puntos += puntosGanados;
             
-            // Iluminar botón en VERDE
             btnSeleccionado.classList.add("correcto");
         } else {
-            // Iluminar botón en ROJO
             btnSeleccionado.classList.add("incorrecto");
         }
 
-        // Breve pausa (800 ms) para mostrar el color antes de cambiar a la siguiente pregunta
         setTimeout(() => {
             pasoSiguientePregunta();
         }, 800);
@@ -662,7 +765,7 @@
         }
     }
 
-    // EVALUACIÓN DE RESULTADOS (>50% DE ACIERTOS = ÉXITO)
+    // EVALUACIÓN DE RESULTADOS (>=50% DE ACIERTOS = ÉXITO)
     function evaluarYFinalizarPartida() {
         cambiarPantalla("pantalla-resultados");
 
@@ -682,7 +785,7 @@
         } else {
             tituloNode.innerText = "¡OPERACIÓN FALLIDA!";
             mensajeNode.className = "resultado-mensaje perdido";
-            mensajeNode.innerHTML = `OPERACIÓN ABORTADA. Solo has alcanzado un ${porcentajeAcierto}% de aciertos (necesitabas más del 50%). La caja fuerte permanece bloqueada.`;
+            mensajeNode.innerHTML = `OPERACIÓN ABORTADA. Solo has alcanzado un ${porcentajeAcierto}% de aciertos (necesitabas al menos el 50%). La caja fuerte permanece bloqueada.`;
             imagenNode.innerHTML = `<img src="./resources/caja_fuerte_cerrada.png" alt="Caja fuerte blindada y cerrada">`;
         }
 
